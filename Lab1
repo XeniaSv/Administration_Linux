@@ -1,0 +1,141 @@
+#!/bin/bash
+
+# 1
+cd ~
+mkdir test
+
+# 2
+cd ~/test/
+for file in /etc/*; do
+	if [[ -d "$file" ]]; then
+		echo "$file/" >> list.txt
+		let countDir=$countDir+1
+	else 
+		echo "$file" >> list.txt
+	fi
+done
+
+for file in /etc/.*; do
+	if [[ -d "$file" ]]; then
+		echo "$file/" >> list.txt
+	else
+		echo "$file" >> list.txt
+		let countHide=$countHide+1
+	fi
+done
+
+# 3
+echo $countDir >> list.txt
+echo $countHide >> list.txt
+
+# 4
+cd ~/test
+mkdir links
+
+# 5
+cd ~/test/links
+ln ~/test/list.txt list_hlink
+
+# 6
+ln -s ~/test/list.txt list_slink
+
+# 7 
+echo "hlink"
+ls -l ~/test/links/list_hlink | cut -d " " -f2
+echo "list.txt"
+ls -l ~/test/list.txt | cut -d " " -f2
+echo "slink"
+ls -l ~/test/links/list_slink | cut -d " " -f2
+
+# 8
+wc -l ~/test/list.txt | cut -d " " -f1 >> ~/test/links/list_hlink
+
+# 9 
+if cmp ~/test/links/list_hlink ~/test/links/list_slink; then
+	echo "YES"
+else
+	echo "NO"
+fi
+
+# 10
+cd ~/test
+mv list.txt list1.txt
+
+# 11
+if cmp ~/test/links/list_hlink ~/test/links/list_slink; then
+	echo "YES"
+else
+	echo "NO"
+fi
+
+# 12
+cd ~/
+ln ~/test/list1.txt list_link
+
+# 13
+find /etc/ -name "*.conf" > ~/list_conf
+
+# 14
+find /etc/ -maxdepth 1 -name "*.d" -type d > ~/list_d
+
+# 15
+cat ~/list_conf ~/list_d > ~/list_conf_d
+
+# 16
+mkdir ~/test/.sub
+
+# 17
+cp ~/list_conf_d ~/test/.sub
+
+# 18
+cp -b ~/list_conf_d ~/test/.sub
+
+# 19
+find ~/test -name "*"
+
+# 20
+man man > ~/man.txt
+
+# 21
+split -b 1024 ~/man.txt "man_copy_"
+
+# 22
+mkdir ~/man.dir
+
+# 23
+mv man_copy_* ~/man.dir
+
+# 24
+cat ~/man.dir/man_copy_* > ~/man.dir/man.txt
+rm -f ~/man.dir/man_copy_*
+
+# 25
+if cmp ~/man.txt ~/man.dir/man.txt; then
+	echo "YES"
+else
+	echo "NO"
+fi
+
+# 26
+echo "hello world! hello world! hello world!" > ~/temp.txt
+cat ~/man.txt >> ~/temp.txt
+cat ~/temp.txt > ~/man.txt
+rm -f ~/temp.txt
+echo "bye world! bye world! bye world!" >> ~/man.txt
+
+# 27
+diff -u ~/man.txt ~/man.dir/man.txt > ~/diff.txt
+
+# 28
+mv ~/diff.txt ~/man.dir
+
+# 29
+patch ~/man.dir/man.txt ~/man.dir/diff.txt
+
+# 30
+if cmp ~/man.txt ~/man.dir/man.txt; then
+	echo "YES"
+else
+	echo "NO"
+fi
+
